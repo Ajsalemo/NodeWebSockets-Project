@@ -14,7 +14,20 @@ export default {
   },
   methods: {
     connect() {
-      console.log('Hello')
+      const url = "ws://localhost:3000";
+      const wsClient = new WebSocket(url);
+
+      wsClient.onopen = () => {
+        console.log(`Connection to ${url} has been established`);
+      };
+
+      wsClient.onmessage = (e) => {
+        console.log(e.data);
+      };
+
+      wsClient.onerror = (err) => {
+        console.log(`WebSocket error: ${err}`);
+      };
     },
   },
 };
