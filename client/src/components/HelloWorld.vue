@@ -19,21 +19,10 @@ export default {
   props: {
     msg: String,
   },
-  // inject: {
-  //   ws: {
-  //     from: "webSocketClient",
-  //   },
-  // },
   methods: {
     connect() {
-      console.log(this.isConnected);
-      console.log(this.ws);
-
       if (this.ws.readyState === 3) {
-        console.log("WebSocket connection is currently closed.")
-        this.ws.addEventListener("open", () => {
-          this.ws.send("Connecting..");
-        });
+        console.log("WebSocket connection is currently closed.");
       }
       this.ws.onopen = () => {
         console.log(`Connection to ${this.ws.url} has been established`);
@@ -45,29 +34,38 @@ export default {
       };
 
       this.ws.onerror = (err) => {
-        console.log(`WebSocket error: ${err}`);
+        console.log("WebSocket error: ", err);
       };
     },
     submit() {
-      this.ws.send(this.message);
+      console.log(this.ws.readyState);
+      if (this.ws.readyState === 1) {
+        this.ws.send(this.message);
+      } else if (this.ws.readyState === 3) {
+        console.log(`Connection is closed`);
+      }
     },
   },
   data() {
     return {
       isConnected: false,
       message: "",
-      ws: new WebSocket(process.env.HOST_URL
-  ? `ws://${process.env.HOST_URL}`
-  : "ws://localhost:3000")
+      ws: new WebSocket(
+        process.env.HOST_URL
+          ? `ws://${process.env.HOST_URL}`
+          : "ws://localhost:3000"
+      ),
     };
   },
   mounted() {
-    console.log(`Attempting to connect - WebSocket state: ${this.ws.readyState}`);
+    console.log(
+      `Attempting to connect - WebSocket state: ${this.ws.readyState}`
+    );
     this.connect();
   },
   beforeUnmount() {
     console.log(
-      "Disconnecting from the current WebSocket session - WebSocket state: ${this.ws.readyState}"
+      `Disconnecting from the current WebSocket session - WebSocket state: ${this.ws.readyState}`
     );
     this.ws.close();
   },

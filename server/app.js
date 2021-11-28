@@ -10,9 +10,9 @@ socket.on("connection", (socket) => {
   socket.on("message", (message) => {
     console.log(`New message from client: ${message}`);
   });
+});
 
-  socket.on("close", (socket) => {
-    console.log(socket);
-    console.log("Closing connection from the server.");
-  });
+socket.on("close", (socket) => {
+  console.log(socket);
+  console.log("Closing connection from the server.");
 });
