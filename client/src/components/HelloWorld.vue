@@ -2,7 +2,9 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <h3>Chat</h3>
-    <span v-if="isConnected === true">You are now connected via WebSockets</span>
+    <span v-if="isConnected === true"
+      >You are now connected via WebSockets</span
+    >
     <span v-else>Connecting..</span>
     <form @submit.prevent="submit" v-if="isConnected === true">
       <input type="text" v-model="message" name="message" />
@@ -17,15 +19,24 @@ export default {
   props: {
     msg: String,
   },
-  inject: {
-    ws: {
-      from: "webSocketClient"
-    }
-  },
+  // inject: {
+  //   ws: {
+  //     from: "webSocketClient",
+  //   },
+  // },
   methods: {
     connect() {
+      console.log(this.isConnected);
+      console.log(this.ws);
+
+      if (this.ws.readyState === 3) {
+        console.log("WebSocket connection is currently closed.")
+        this.ws.addEventListener("open", () => {
+          this.ws.send("Connecting..");
+        });
+      }
       this.ws.onopen = () => {
-        console.log(`Connection to ${this.url} has been established`);
+        console.log(`Connection to ${this.ws.url} has been established`);
         this.isConnected = true;
       };
 
@@ -45,10 +56,23 @@ export default {
     return {
       isConnected: false,
       message: "",
+      ws: new WebSocket(process.env.HOST_URL
+  ? `ws://${process.env.HOST_URL}`
+  : "ws://localhost:3000")
     };
   },
-  created() {
-    this.connect()
+  mounted() {
+    console.log(`Attempting to connect - WebSocket state: ${this.ws.readyState}`);
+    this.connect();
+  },
+  beforeUnmount() {
+    console.log(
+      "Disconnecting from the current WebSocket session - WebSocket state: ${this.ws.readyState}"
+    );
+    this.ws.close();
+  },
+  unmounted() {
+    console.log(`WebSocket state: ${this.ws.readyState}`);
   },
 };
 </script>
