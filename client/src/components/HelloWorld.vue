@@ -2,8 +2,12 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <h3>Chat</h3>
-    <button @click="connect">Connect to chat</button>
-    <input type="text" v-if="isConnected === true" />
+    <span v-if="isConnected === true">You are now connected via WebSockets</span>
+    <span v-else>Connecting..</span>
+    <form @submit.prevent="submit" v-if="isConnected === true">
+      <input type="text" v-model="message" name="message" />
+      <button type="submit">Submit</button>
+    </form>
   </div>
 </template>
 
@@ -13,31 +17,38 @@ export default {
   props: {
     msg: String,
   },
+  inject: {
+    ws: {
+      from: "webSocketClient"
+    }
+  },
   methods: {
     connect() {
-      const url = process.env.HOST_URL
-        ? `ws://${process.env.HOST_URL}`
-        : "ws://localhost:3000";
-      const wsClient = new WebSocket(url);
-
-      wsClient.onopen = () => {
-        console.log(`Connection to ${url} has been established`);
+      this.ws.onopen = () => {
+        console.log(`Connection to ${this.url} has been established`);
         this.isConnected = true;
       };
 
-      wsClient.onmessage = (e) => {
+      this.ws.onmessage = (e) => {
         console.log(e.data);
       };
 
-      wsClient.onerror = (err) => {
+      this.ws.onerror = (err) => {
         console.log(`WebSocket error: ${err}`);
       };
+    },
+    submit() {
+      this.ws.send(this.message);
     },
   },
   data() {
     return {
       isConnected: false,
+      message: "",
     };
+  },
+  created() {
+    this.connect()
   },
 };
 </script>
