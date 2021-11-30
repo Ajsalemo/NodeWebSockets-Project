@@ -1,17 +1,21 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <Main />
+  <div class="grid grid-cols-3 h-screen">
+    <Sidebar />
+    <Main />
+  </div>
 </template>
 
 <script>
-import Main from './components/Main.vue'
+import Main from "./components/Main.vue";
+import Sidebar from "./components/Sidebar.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    Main
-  }
-}
+    Main,
+    Sidebar,
+  },
+};
 </script>
 
 <style>

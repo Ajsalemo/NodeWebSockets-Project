@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="bg-white">
     <span v-if="isConnected === true"
       >You are now connected via WebSockets</span
     >
@@ -14,6 +14,7 @@
 
 <script>
 export default {
+  name: "Main",
   methods: {
     connect() {
       this.ws = new WebSocket(
