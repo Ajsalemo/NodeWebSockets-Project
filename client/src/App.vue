@@ -1,19 +1,14 @@
 <template>
-  <div class="grid grid-cols-2 h-screen">
-    <Sidebar />
-    <Main />
-  </div>
+  <Main />
 </template>
 
 <script>
 import Main from "./components/Main.vue";
-import Sidebar from "./components/Sidebar.vue";
 
 export default {
   name: "App",
   components: {
     Main,
-    Sidebar,
   },
 };
 </script>

@@ -1,20 +1,36 @@
 <template>
-  <div class="bg-white">
-    <span v-if="isConnected === true"
-      >You are now connected via WebSockets</span
-    >
-    <span v-if="isConnected === null || ws === null">Loading..</span>
-    <span v-if="isConnected === false">Connecting..</span>
-    <form @submit.prevent="submit" v-if="isConnected === true">
-      <input type="text" v-model="message" name="message" />
-      <button type="submit">Submit</button>
-    </form>
+  <div class="flex h-screen w-full">
+    <LeftSidebar />
+    <div class="bg-white w-1/2">
+      <Header />
+      <div>
+        <span v-if="isConnected === true"
+          >You are now connected via WebSockets</span
+        >
+        <span v-if="isConnected === null || ws === null">Loading..</span>
+        <span v-if="isConnected === false">Connecting..</span>
+        <form @submit.prevent="submit" v-if="isConnected === true">
+          <input type="text" v-model="message" name="message" />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+    <RightSidebar />
   </div>
 </template>
 
 <script>
+import LeftSidebar from "./LeftSidebar.vue";
+import RightSidebar from "./RightSidebar.vue";
+import Header from "./Header.vue";
+
 export default {
   name: "Main",
+  components: {
+    LeftSidebar,
+    RightSidebar,
+    Header,
+  },
   methods: {
     connect() {
       this.ws = new WebSocket(
