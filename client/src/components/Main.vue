@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen w-full">
+  <div class="flex h-screen w-full font-ui">
     <LeftSidebar />
     <div class="bg-white w-1/2">
       <Header />
@@ -9,8 +9,14 @@
         >
         <span v-if="isConnected === null || ws === null">Loading..</span>
         <span v-if="isConnected === false">Connecting..</span>
-        <form @submit.prevent="submit" v-if="isConnected === true">
-          <input type="text" v-model="message" name="message" />
+        <ul v-if="messages.length > 0" class="flex flex-col">
+          <li v-for="(message, i) in messages" :key="i" class="text-left">
+            <span>{{ message.user }}</span>
+            <span>{{ message.msg }}</span>
+          </li>
+        </ul>
+        <form @submit.prevent="submit" v-if="isConnected === true" class="absolute bottom-0">
+          <input type="text" v-model="chat" name="chat" />
           <button type="submit">Submit</button>
         </form>
       </div>
@@ -54,7 +60,11 @@ export default {
       });
 
       this.ws.addEventListener("message", (e) => {
-        console.log(e.data);
+        console.log(e);
+        if (e && e.data) {
+          console.log(e.data)
+          this.messages.push(e.data);
+        }
       });
 
       this.ws.addEventListener("error", (e) => {
@@ -63,7 +73,7 @@ export default {
     },
     submit() {
       if (this.ws.readyState === 1) {
-        return this.ws.send(this.message);
+        return this.ws.send(this.chat);
       }
       console.error("An error has occurred. Please try again");
     },
@@ -99,8 +109,9 @@ export default {
   data() {
     return {
       isConnected: false,
-      message: "",
+      messages: [],
       ws: null,
+      chat: "",
     };
   },
   mounted() {

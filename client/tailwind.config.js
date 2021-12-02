@@ -5,6 +5,9 @@ module.exports = {
     colors: {
       slackMain: "#3f0f3f",
     },
+    fontFamily: {
+      'ui': ['Noto Sans']
+    },
     extend: {},
   },
   variants: {

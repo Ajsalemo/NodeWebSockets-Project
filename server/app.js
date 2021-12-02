@@ -9,7 +9,10 @@ socket.on("connection", (sock) => {
 
   sock.on("message", (message) => {
     console.log(`New message from client: ${message}`);
-    sock.send(`Echoing back the client message: ${message}`);
+    sock.send(JSON.stringify({
+      msg: `Echoing back the client message: ${message}`,
+      user: process.env.COMPUTERNAME
+    }));
   });
 });
 
