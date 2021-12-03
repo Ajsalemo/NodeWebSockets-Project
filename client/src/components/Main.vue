@@ -1,40 +1,43 @@
 <template>
   <div class="flex h-screen w-full font-ui">
     <LeftSidebar />
-    <div class="bg-white w-1/2">
-      <Header />
+    <div class="bg-white w-full">
+      <Header :isConnected="this.isConnected" />
       <div>
-        <span v-if="isConnected === true"
-          >You are now connected via WebSockets</span
-        >
-        <span v-if="isConnected === null || ws === null">Loading..</span>
-        <span v-if="isConnected === false">Connecting..</span>
-        <ul v-if="messages.length > 0" class="flex flex-col">
-          <li v-for="(message, i) in messages" :key="i" class="text-left">
-            <span>{{ message.user }}</span>
-            <span>{{ message.msg }}</span>
+        <ul v-if="serverMessages.length > 0" class="flex flex-col">
+          <li
+            v-for="(message, i) in serverMessages"
+            :key="i"
+            class="text-left flex flex-col"
+          >
+            <div class="flex flex-row">
+              <p class="text-sm font-bold">{{ message.user }}</p>
+              <p class="text-xs self-center pl-2">{{ message.serverTime }}</p>
+            </div>
+            <p class="text-xs">{{ message.msg }}</p>
           </li>
         </ul>
-        <form @submit.prevent="submit" v-if="isConnected === true" class="absolute bottom-0">
+        <form
+          @submit.prevent="submit"
+          v-if="isConnected === true"
+          class="absolute bottom-0"
+        >
           <input type="text" v-model="chat" name="chat" />
           <button type="submit">Submit</button>
         </form>
       </div>
     </div>
-    <RightSidebar />
   </div>
 </template>
 
 <script>
 import LeftSidebar from "./LeftSidebar.vue";
-import RightSidebar from "./RightSidebar.vue";
 import Header from "./Header.vue";
 
 export default {
   name: "Main",
   components: {
     LeftSidebar,
-    RightSidebar,
     Header,
   },
   methods: {
@@ -51,8 +54,9 @@ export default {
       });
 
       this.ws.addEventListener("close", () => {
-        console.log("Client connection is closed.");
+        console.error("Client connection is closed.");
         this.isConnected = false;
+        // This has the client automatically reconnect if the server closes the connection
         if (this.ws.readyState === 3) {
           this.ws = null;
           setTimeout(this.connect(), 10000);
@@ -60,10 +64,9 @@ export default {
       });
 
       this.ws.addEventListener("message", (e) => {
-        console.log(e);
         if (e && e.data) {
-          console.log(e.data)
-          this.messages.push(e.data);
+          console.log(JSON.parse(e.data));
+          this.serverMessages.push(JSON.parse(e.data));
         }
       });
 
@@ -73,9 +76,12 @@ export default {
     },
     submit() {
       if (this.ws.readyState === 1) {
-        return this.ws.send(this.chat);
+        this.clientMessages.push(this.chat);
+        console.log(this.clientMessages);
+        this.ws.send(this.chat);
+      } else {
+        console.error("An error has occurred. Please try again");
       }
-      console.error("An error has occurred. Please try again");
     },
     check() {
       switch (this.ws.readyState) {
@@ -109,7 +115,8 @@ export default {
   data() {
     return {
       isConnected: false,
-      messages: [],
+      serverMessages: [],
+      clientMessages: [],
       ws: null,
       chat: "",
     };

@@ -9,9 +9,13 @@ socket.on("connection", (sock) => {
 
   sock.on("message", (message) => {
     console.log(`New message from client: ${message}`);
+    const serverCurrentTime = new Date()
+    const serverCurrentTimeFormatted = serverCurrentTime.toLocaleTimeString()
+    console.log(serverCurrentTimeFormatted)
     sock.send(JSON.stringify({
       msg: `Echoing back the client message: ${message}`,
-      user: process.env.COMPUTERNAME
+      user: process.env.COMPUTERNAME,
+      serverTime: serverCurrentTimeFormatted
     }));
   });
 });
