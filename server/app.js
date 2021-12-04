@@ -9,7 +9,7 @@ socket.on("connection", (sock) => {
 
   sock.on("message", (message) => {
     console.log(`New message from client: ${message}`);
-    const serverCurrentTime = new Date(Date.now() + 1000);
+    const serverCurrentTime = new Date();
     const serverCurrentTimeFormatted = serverCurrentTime.toLocaleTimeString();
     const serverMetaData = {
       serverMsg: `Echoing back the client message: ${message}`,

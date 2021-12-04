@@ -1,12 +1,12 @@
 <template>
-  <div class="flex h-screen w-full font-ui">
+  <div class="flex min-h-screen w-full font-ui">
     <LeftSidebar />
     <div class="bg-white w-full">
       <Header :isConnected="this.isConnected" />
-      <div>
-        <ul v-if="mergeChatArr.length > 0" class="flex flex-col">
+      <div class="pt-8">
+        <ul v-if="messages.length > 0" class="flex flex-col">
           <li
-            v-for="(message, i) in mergeChatArr"
+            v-for="(message, i) in messages"
             :key="i"
             class="text-left flex flex-col"
           >
@@ -75,14 +75,7 @@ export default {
       this.ws.addEventListener("message", (e) => {
         if (e && e.data) {
           console.log(JSON.parse(e.data));
-          this.serverMessages.push(JSON.parse(e.data));
-          this.mergeChatArr = [...this.clientMessages, ...this.serverMessages];
-          const sortedMergedArr = this.mergeChatArr.slice().sort((a, b) => {
-            console.log(a.serverTime)
-            console.log(b.clientTime)
-            return b.clientTime - a.serverTime
-          })
-          console.log(sortedMergedArr)
+          this.messages.push(JSON.parse(e.data));
         }
       });
 
@@ -99,8 +92,7 @@ export default {
         clientTime: clientCurrentTimeFormatted,
       };
       if (this.ws.readyState === 1) {
-        this.clientMessages.push(clientMetaData);
-        this.mergeChatArr = [...this.clientMessages, ...this.serverMessages];
+        this.messages.push(clientMetaData);
         this.ws.send(this.chat);
       } else {
         console.error("An error has occurred. Please try again");
@@ -138,9 +130,7 @@ export default {
   data() {
     return {
       isConnected: false,
-      serverMessages: [],
-      clientMessages: [],
-      mergeChatArr: [],
+      messages: [],
       ws: null,
       chat: "",
     };
