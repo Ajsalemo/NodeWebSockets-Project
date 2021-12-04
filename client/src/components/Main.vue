@@ -4,17 +4,26 @@
     <div class="bg-white w-full">
       <Header :isConnected="this.isConnected" />
       <div>
-        <ul v-if="serverMessages.length > 0" class="flex flex-col">
+        <ul v-if="mergeChatArr.length > 0" class="flex flex-col">
           <li
-            v-for="(message, i) in serverMessages"
+            v-for="(message, i) in mergeChatArr"
             :key="i"
             class="text-left flex flex-col"
           >
-            <div class="flex flex-row">
-              <p class="text-sm font-bold">{{ message.user }}</p>
-              <p class="text-xs self-center pl-2">{{ message.serverTime }}</p>
+            <div>
+              <div class="flex flex-row">
+                <p class="text-sm font-bold">{{ message.clientUser }}</p>
+                <p class="text-xs self-center pl-2">{{ message.clientTime }}</p>
+              </div>
+              <p class="text-xs">{{ message.clientMsg }}</p>
             </div>
-            <p class="text-xs">{{ message.msg }}</p>
+            <div>
+              <div class="flex flex-row">
+                <p class="text-sm font-bold">{{ message.serverUser }}</p>
+                <p class="text-xs self-center pl-2">{{ message.serverTime }}</p>
+              </div>
+              <p class="text-xs">{{ message.serverMsg }}</p>
+            </div>
           </li>
         </ul>
         <form
@@ -67,6 +76,13 @@ export default {
         if (e && e.data) {
           console.log(JSON.parse(e.data));
           this.serverMessages.push(JSON.parse(e.data));
+          this.mergeChatArr = [...this.clientMessages, ...this.serverMessages];
+          const sortedMergedArr = this.mergeChatArr.slice().sort((a, b) => {
+            console.log(a.serverTime)
+            console.log(b.clientTime)
+            return b.clientTime - a.serverTime
+          })
+          console.log(sortedMergedArr)
         }
       });
 
@@ -75,9 +91,16 @@ export default {
       });
     },
     submit() {
+      const clientCurrentTime = new Date();
+      const clientCurrentTimeFormatted = clientCurrentTime.toLocaleTimeString();
+      const clientMetaData = {
+        clientMsg: this.chat,
+        clientUser: "TestUser",
+        clientTime: clientCurrentTimeFormatted,
+      };
       if (this.ws.readyState === 1) {
-        this.clientMessages.push(this.chat);
-        console.log(this.clientMessages);
+        this.clientMessages.push(clientMetaData);
+        this.mergeChatArr = [...this.clientMessages, ...this.serverMessages];
         this.ws.send(this.chat);
       } else {
         console.error("An error has occurred. Please try again");
@@ -117,6 +140,7 @@ export default {
       isConnected: false,
       serverMessages: [],
       clientMessages: [],
+      mergeChatArr: [],
       ws: null,
       chat: "",
     };

@@ -9,14 +9,14 @@ socket.on("connection", (sock) => {
 
   sock.on("message", (message) => {
     console.log(`New message from client: ${message}`);
-    const serverCurrentTime = new Date()
-    const serverCurrentTimeFormatted = serverCurrentTime.toLocaleTimeString()
-    console.log(serverCurrentTimeFormatted)
-    sock.send(JSON.stringify({
-      msg: `Echoing back the client message: ${message}`,
-      user: process.env.COMPUTERNAME,
-      serverTime: serverCurrentTimeFormatted
-    }));
+    const serverCurrentTime = new Date(Date.now() + 1000);
+    const serverCurrentTimeFormatted = serverCurrentTime.toLocaleTimeString();
+    const serverMetaData = {
+      serverMsg: `Echoing back the client message: ${message}`,
+      serverUser: process.env.COMPUTERNAME,
+      serverTime: serverCurrentTimeFormatted,
+    };
+    sock.send(JSON.stringify(serverMetaData));
   });
 });
 
