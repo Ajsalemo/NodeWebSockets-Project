@@ -29,10 +29,21 @@
         <form
           @submit.prevent="submit"
           v-if="isConnected === true"
-          class="absolute bottom-0"
+          class="absolute bottom-0 ml-12 mb-8"
         >
-          <input type="text" v-model="chat" name="chat" />
-          <button type="submit">Submit</button>
+          <div class="flex flex-col">
+            <textarea
+              rows="4"
+              cols="50"
+              v-model="chat"
+              name="chat"
+              placeholder="Message"
+              class="rounded border-2 border-light-blue-500 border-opacity-25"
+            />
+            <button type="submit" class="w-8 self-end">
+              <i class="far fa-share-square"></i>
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -74,13 +85,12 @@ export default {
 
       this.ws.addEventListener("message", (e) => {
         if (e && e.data) {
-          console.log(JSON.parse(e.data));
           this.messages.push(JSON.parse(e.data));
         }
       });
 
       this.ws.addEventListener("error", (e) => {
-        console.log(e);
+        console.error(e);
       });
     },
     submit() {
@@ -94,6 +104,7 @@ export default {
       if (this.ws.readyState === 1) {
         this.messages.push(clientMetaData);
         this.ws.send(this.chat);
+        this.chat = "";
       } else {
         console.error("An error has occurred. Please try again");
       }
