@@ -1,6 +1,6 @@
 <template>
   <div class="flex min-h-screen w-full font-ui">
-    <LeftSidebar />
+    <LeftSidebar :uniqueServerUsers="uniqueServerUsers" />
     <div class="bg-white w-full">
       <Header :isConnected="this.isConnected" />
       <div class="pt-8">
@@ -86,6 +86,20 @@ export default {
       this.ws.addEventListener("message", (e) => {
         if (e && e.data) {
           this.messages.push(JSON.parse(e.data));
+          /* 
+            Loop over the objects coming from the Websocket server to parse the username within
+            NOTE: There definitely is a better way to do this, but leaving this as is, for now, since it 'works'
+          */
+          for (let i = 0; i < this.messages.length; i++) {
+            if (
+              this.messages[i] &&
+              this.messages[i].serverUser !== undefined
+            ) {
+              const serverSideUser = this.messages[i].serverUser;
+              this.serverUsers.push(serverSideUser);
+            }
+          }
+          this.uniqueServerUsers = [...new Set(this.serverUsers)];
         }
       });
 
@@ -144,6 +158,8 @@ export default {
       messages: [],
       ws: null,
       chat: "",
+      serverUsers: [],
+      uniqueServerUsers: null,
     };
   },
   mounted() {

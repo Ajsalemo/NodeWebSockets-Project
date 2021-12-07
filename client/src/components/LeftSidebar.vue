@@ -4,7 +4,11 @@
     <div class="flex w-full flex-col">
       <div class="border-solid border-2 border-light-blue-500 h-24"></div>
       <div class="border-solid border-2 border-light-blue-500 h-96"></div>
-      <div class="border-solid border-2 border-light-blue-500 h-full"></div>
+      <div class="border-solid border-2 border-light-blue-500 h-full">
+        <ul v-if="uniqueServerUsers" class="text-white">
+          <li v-for="(user, j) in uniqueServerUsers" :key="j"># {{ user }}</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -12,5 +16,8 @@
 <script>
 export default {
   name: "Sidebar",
+  props: {
+    uniqueServerUsers: Array,
+  },
 };
 </script>
