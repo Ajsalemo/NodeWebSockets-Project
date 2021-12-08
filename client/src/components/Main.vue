@@ -38,7 +38,7 @@
               v-model="chat"
               name="chat"
               placeholder="Message"
-              class="rounded border-2 border-light-blue-500 border-opacity-25"
+              class="rounded border-2 border-gray-600 border-opacity-25"
             />
             <button type="submit" class="w-8 self-end">
               <i class="far fa-share-square"></i>
@@ -121,6 +121,7 @@ export default {
         this.chat = "";
       } else {
         console.error("An error has occurred. Please try again");
+        this.ws.close()
       }
     },
     check() {

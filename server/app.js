@@ -5,12 +5,16 @@ const socket = new ws.Server({ port });
 console.log(`Server listening on port: ${port}`);
 
 socket.on("connection", (sock) => {
-  sock.send("Hi client! You are now connected to me!");
+  const initialMsgMetaData = {
+    serverMsg: "Hi client! You are now connected to me!",
+    serverUser: process.env.COMPUTERNAME,
+  };
+  sock.send(JSON.stringify(initialMsgMetaData));
 
   sock.on("message", (message) => {
-    console.log(`New message from client: ${message}`);
     const serverCurrentTime = new Date();
     const serverCurrentTimeFormatted = serverCurrentTime.toLocaleTimeString();
+    console.log(`New message from client: ${message}`);
     const serverMetaData = {
       serverMsg: `Echoing back the client message: ${message}`,
       serverUser: process.env.COMPUTERNAME,
