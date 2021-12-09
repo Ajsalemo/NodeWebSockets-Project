@@ -30,6 +30,7 @@
           @submit.prevent="submit"
           v-if="isConnected === true"
           class="absolute bottom-0 ml-12 mb-8"
+          required
         >
           <div class="flex flex-col">
             <textarea
