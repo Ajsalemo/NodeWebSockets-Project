@@ -41,9 +41,20 @@
               placeholder="Message"
               class="rounded border-2 border-gray-600 border-opacity-25"
             />
-            <button type="submit" class="w-8 self-end">
-              <i class="far fa-share-square"></i>
-            </button>
+            <div class="flex justify-between">
+              <div>
+                <span class="text-red-500" v-if="v$.chat.$error">{{
+                  v$.chat.$errors[0].$message
+                }}</span>
+              </div>
+              <button
+                type="submit"
+                :class="v$.chat.$error ? 'w-8 cursor-not-allowed' : 'w-8'"
+                :disabled="v$.chat.$error"
+              >
+                <i class="far fa-share-square"></i>
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -54,6 +65,8 @@
 <script>
 import LeftSidebar from "./LeftSidebar.vue";
 import Header from "./Header.vue";
+import useValidate from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 
 export default {
   name: "Main",
@@ -92,10 +105,7 @@ export default {
             NOTE: There definitely is a better way to do this, but leaving this as is, for now, since it 'works'
           */
           for (let i = 0; i < this.messages.length; i++) {
-            if (
-              this.messages[i] &&
-              this.messages[i].serverUser !== undefined
-            ) {
+            if (this.messages[i] && this.messages[i].serverUser !== undefined) {
               const serverSideUser = this.messages[i].serverUser;
               this.serverUsers.push(serverSideUser);
             }
@@ -109,20 +119,27 @@ export default {
       });
     },
     submit() {
-      const clientCurrentTime = new Date();
-      const clientCurrentTimeFormatted = clientCurrentTime.toLocaleTimeString();
-      const clientMetaData = {
-        clientMsg: this.chat,
-        clientUser: "TestUser",
-        clientTime: clientCurrentTimeFormatted,
-      };
-      if (this.ws.readyState === 1) {
-        this.messages.push(clientMetaData);
-        this.ws.send(this.chat);
-        this.chat = "";
+      this.v$.$validate();
+
+      if (!this.v$.$error) {
+        const clientCurrentTime = new Date();
+        const clientCurrentTimeFormatted =
+          clientCurrentTime.toLocaleTimeString();
+        const clientMetaData = {
+          clientMsg: this.chat,
+          clientUser: "TestUser",
+          clientTime: clientCurrentTimeFormatted,
+        };
+        if (this.ws.readyState === 1) {
+          this.messages.push(clientMetaData);
+          this.ws.send(this.chat);
+          this.chat = "";
+        } else {
+          console.error("An error has occurred. Please try again");
+          this.ws.close();
+        }
       } else {
-        console.error("An error has occurred. Please try again");
-        this.ws.close()
+        console.error(this.v$.$error);
       }
     },
     check() {
@@ -156,12 +173,18 @@ export default {
   },
   data() {
     return {
+      v$: useValidate(),
       isConnected: false,
       messages: [],
       ws: null,
       chat: "",
       serverUsers: [],
       uniqueServerUsers: null,
+    };
+  },
+  validations() {
+    return {
+      chat: { required },
     };
   },
   mounted() {
