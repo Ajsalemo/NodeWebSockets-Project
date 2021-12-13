@@ -77,8 +77,8 @@ export default {
   methods: {
     connect() {
       this.ws = new WebSocket(
-        process.env.HOST_URL
-          ? `ws://${process.env.HOST_URL}`
+        process.env.VUE_APP_HOST_URL
+          ? `wss://${process.env.VUE_APP_HOST_URL}`
           : "ws://localhost:3000"
       );
 

@@ -1,7 +1,8 @@
 const ws = require("ws");
 const port = process.env.PORT || 3000;
+const host = process.env.HOST || "localhost";
 
-const socket = new ws.Server({ port });
+const socket = new ws.Server({ host, port });
 console.log(`Server listening on port: ${port}`);
 
 socket.on("connection", (sock) => {
